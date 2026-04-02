@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id                String        @id @default(cuid())
+  code              String        @unique
+  title             String        @default("The Empathy Game")
+  status            String        @default("WAITING") // WAITING | ACTIVE | PAUSED | COMPLETED
+  currentRoundIndex Int           @default(-1)
+  adminKey          String        @unique
+  // Settings (stored inline for SQLite compatibility)
+  timerEnabled      Boolean       @default(false)
+  timerDuration     Int           @default(120)
+  anonymousMode     Boolean       @default(false)
+  allowLateJoin     Boolean       @default(true)
+  allowEdits        Boolean       @default(true)
+  revealAfterEach   Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  participants  Participant[]
+  sessionRounds SessionRound[]
+}
+
+model Participant {
+  id          String   @id @default(cuid())
+  sessionId   String
+  displayName String
+  teamName    String
+  sessionKey  String   @unique
+  isAdmin     Boolean  @default(false)
+  joinedAt    DateTime @default(now())
+
+  session     Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+}
+
+model Round {
+  id              String  @id @default(cuid())
+  orderIndex      Int
+  title           String
+  scenario        String
+  task            String
+  isBonus         Boolean @default(false)
+  roboticResponse String?
+  facilitatorNote String?
+
+  sessionRounds SessionRound[]
+}
+
+model SessionRound {
+  id         String    @id @default(cuid())
+  sessionId  String
+  roundId    String
+  orderIndex Int
+  status     String    @default("PENDING") // PENDING | ACTIVE | CLOSED
+  startedAt  DateTime?
+  closedAt   DateTime?
+
+  session     Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  round       Round        @relation(fields: [roundId], references: [id])
+  submissions Submission[]
+}
+
+model Submission {
+  id             String    @id @default(cuid())
+  sessionRoundId String
+  participantId  String
+  responseText   String
+  empathyScore   Int?
+  toneScore      Int?
+  totalScore     Int?
+  bonusMultiplier Float    @default(1.0)
+  finalScore     Float?
+  feedback       String?
+  improvementTip String?
+  scoredAt       DateTime?
+  manualOverride Boolean   @default(false)
+  submittedAt    DateTime  @default(now())
+
+  sessionRound SessionRound @relation(fields: [sessionRoundId], references: [id], onDelete: Cascade)
+  participant  Participant  @relation(fields: [participantId], references: [id], onDelete: Cascade)
+}

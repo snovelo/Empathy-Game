@@ -10,7 +10,7 @@ datasource db {
 model Session {
   id                String        @id @default(cuid())
   code              String        @unique
-  title             String        @default("The Empathy Game")
+  title             String        @default("The GOLD Standard Game")
   status            String        @default("WAITING") // WAITING | ACTIVE | PAUSED | COMPLETED
   currentRoundIndex Int           @default(-1)
   adminKey          String        @unique
@@ -50,6 +50,8 @@ model Round {
   isBonus         Boolean @default(false)
   roboticResponse String?
   facilitatorNote String?
+  category        String? // standard | complex | de-escalation
+  difficulty      String? // standard | complex | de-escalation (alias for ordering)
 
   sessionRounds SessionRound[]
 }
@@ -75,6 +77,7 @@ model Submission {
   responseText   String
   empathyScore   Int?
   toneScore      Int?
+  ownershipScore Int?
   totalScore     Int?
   bonusMultiplier Float    @default(1.0)
   finalScore     Float?

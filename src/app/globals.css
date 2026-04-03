@@ -24,7 +24,7 @@ body {
 
 /* Focus rings for accessibility */
 :focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid #f59e0b;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -35,14 +35,14 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #1a1a1a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #3a3a3a;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #f59e0b;
 }
 
 /* SSE / realtime pulse dot */

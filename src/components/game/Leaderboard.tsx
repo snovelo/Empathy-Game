@@ -16,8 +16,8 @@ export function Leaderboard({ entries, highlightTeam, showWinner }: LeaderboardP
       {showWinner && sorted[0] && (
         <div className="text-center py-4 animate-slide-up">
           <p className="text-4xl mb-2">🏆</p>
-          <p className="text-2xl font-bold text-slate-900">{sorted[0].teamName}</p>
-          <p className="text-brand-600 font-semibold mt-1">Most Empathetic Team</p>
+          <p className="text-2xl font-bold text-white">{sorted[0].teamName}</p>
+          <p className="text-brand-400 font-semibold mt-1">Top GOLD Standard Team</p>
         </div>
       )}
 
@@ -31,8 +31,8 @@ export function Leaderboard({ entries, highlightTeam, showWinner }: LeaderboardP
             key={entry.teamName}
             className={cn(
               'rounded-xl border p-4 transition-all duration-300',
-              isFirst && !showWinner && 'border-amber-300 bg-amber-50',
-              !isFirst && 'border-slate-200 bg-white',
+              isFirst && !showWinner && 'border-brand-500/50 bg-brand-950/30 shadow-[0_0_12px_rgba(245,158,11,0.1)]',
+              !isFirst && 'border-slate-800 bg-slate-900',
               isHighlighted && 'ring-2 ring-brand-400',
             )}
           >
@@ -40,23 +40,22 @@ export function Leaderboard({ entries, highlightTeam, showWinner }: LeaderboardP
               <span className="text-xl w-8 shrink-0 text-center">{medal}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-bold text-slate-900 truncate">{entry.teamName}</span>
+                  <span className="font-bold text-white truncate">{entry.teamName}</span>
                   <span className={cn('text-xs px-2 py-0.5 rounded-full border font-medium', teamColor(entry.teamName))}>
                     {entry.memberCount} {entry.memberCount === 1 ? 'member' : 'members'}
                   </span>
                 </div>
-                {/* Member breakdown */}
                 <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
                   {entry.members.map((m) => (
                     <span key={m.displayName} className="text-xs text-slate-500">
                       {m.displayName}
-                      <span className="font-medium text-slate-700 ml-1">({m.totalScore})</span>
+                      <span className="font-medium text-slate-400 ml-1">({m.totalScore})</span>
                     </span>
                   ))}
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-2xl font-bold tabular-nums text-slate-900">{entry.totalScore}</p>
+                <p className="text-2xl font-bold tabular-nums text-brand-400">{entry.totalScore}</p>
                 <p className="text-xs text-slate-500">pts</p>
               </div>
             </div>
@@ -65,7 +64,7 @@ export function Leaderboard({ entries, highlightTeam, showWinner }: LeaderboardP
       })}
 
       {sorted.length === 0 && (
-        <div className="text-center py-8 text-slate-400">
+        <div className="text-center py-8 text-slate-500">
           <p className="text-4xl mb-2">🎯</p>
           <p>No scores yet — waiting for submissions.</p>
         </div>

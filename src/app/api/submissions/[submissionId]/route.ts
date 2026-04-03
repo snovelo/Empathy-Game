@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 const OverrideSchema = z.object({
   empathyScore: z.number().int().min(1).max(5),
   toneScore: z.number().int().min(1).max(5),
+  ownershipScore: z.number().int().min(1).max(5).optional(),
   feedback: z.string().optional(),
 });
 
@@ -34,8 +35,9 @@ export async function PATCH(
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { empathyScore, toneScore, feedback } = parsed.data;
-  const totalScore = empathyScore + toneScore;
+  const { empathyScore, toneScore, ownershipScore, feedback } = parsed.data;
+  const effectiveOwnership = ownershipScore ?? submission.ownershipScore ?? 1;
+  const totalScore = empathyScore + toneScore + effectiveOwnership;
   const finalScore = totalScore * submission.bonusMultiplier;
 
   const updated = await prisma.submission.update({
@@ -43,6 +45,7 @@ export async function PATCH(
     data: {
       empathyScore,
       toneScore,
+      ownershipScore: effectiveOwnership,
       totalScore,
       finalScore,
       ...(feedback !== undefined && { feedback }),

@@ -61,7 +61,7 @@ export default function WaitingRoomPage() {
   }, [sessionId, handleStateChange]);
 
   // Group by team
-  const teams = new Map<string, typeof session.participants>();
+  const teams = new Map<string, NonNullable<typeof session>['participants']>();
   session?.participants.forEach((p) => {
     const list = teams.get(p.teamName) ?? [];
     list.push(p);
@@ -69,21 +69,21 @@ export default function WaitingRoomPage() {
   });
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-brand-50 flex items-center justify-center px-4 py-12">
+    <main className="min-h-screen bg-gradient-to-br from-dark-950 via-slate-950 to-dark-900 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl animate-fade-in">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full px-3 py-1 mb-4 border border-emerald-200">
+          <div className="inline-flex items-center gap-2 bg-emerald-900/30 text-emerald-400 text-xs font-semibold rounded-full px-3 py-1 mb-4 border border-emerald-700/40">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping-slow" />
             Waiting for game to start
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-3xl font-bold text-white">
             {session?.title ?? 'The Empathy Game'}
           </h1>
           {session?.code && (
             <div className="mt-3 inline-flex items-center gap-2">
-              <span className="text-slate-500 text-sm">Session code:</span>
-              <code className="bg-brand-100 text-brand-700 font-mono font-bold px-3 py-1 rounded-lg text-lg tracking-widest border border-brand-200">
+              <span className="text-slate-400 text-sm">Session code:</span>
+              <code className="bg-brand-500/20 text-brand-300 font-mono font-bold px-3 py-1 rounded-lg text-lg tracking-widest border border-brand-500/30">
                 {session.code}
               </code>
             </div>
@@ -91,9 +91,9 @@ export default function WaitingRoomPage() {
         </div>
 
         {/* Participants */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-4">
+        <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6 mb-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-slate-900">Participants</h2>
+            <h2 className="font-bold text-white">Participants</h2>
             <Badge variant="info">{session?.participants.length ?? 0} joined</Badge>
           </div>
 
@@ -117,8 +117,8 @@ export default function WaitingRoomPage() {
                       key={p.id}
                       className={`text-sm px-3 py-1 rounded-full border font-medium ${
                         p.displayName === myName
-                          ? 'bg-brand-100 text-brand-700 border-brand-300'
-                          : 'bg-slate-50 text-slate-700 border-slate-200'
+                          ? 'bg-brand-500/20 text-brand-300 border-brand-500/40'
+                          : 'bg-slate-800 text-slate-300 border-slate-700'
                       }`}
                     >
                       {p.displayName === myName ? '⭐ ' : ''}
@@ -131,21 +131,21 @@ export default function WaitingRoomPage() {
           </div>
         </div>
 
-        <div className="bg-brand-50 rounded-2xl border border-brand-200 p-4 text-center">
-          <p className="text-brand-700 text-sm font-medium">
+        <div className="bg-brand-500/10 rounded-2xl border border-brand-500/30 p-4 text-center">
+          <p className="text-brand-300 text-sm font-medium">
             The facilitator will start the game when everyone is ready.
           </p>
-          <p className="text-brand-500 text-xs mt-1">
+          <p className="text-brand-400 text-xs mt-1">
             You&apos;ll be redirected automatically when the game begins.
           </p>
         </div>
 
         {/* Tip */}
-        <div className="mt-6 bg-white rounded-xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500 text-center font-medium mb-2">💡 Quick Tip</p>
-          <p className="text-sm text-slate-600 text-center">
-            When responding to customers, always acknowledge the emotion before offering a solution.
-            Think: <em>&ldquo;Validate feelings first. Solve second.&rdquo;</em>
+        <div className="mt-6 bg-slate-900 rounded-xl border border-slate-800 p-4">
+          <p className="text-xs text-slate-400 text-center font-medium mb-2">💡 Quick Tip</p>
+          <p className="text-sm text-slate-400 text-center">
+            Remember the GOLD Standard: <strong>G</strong>o beyond the ask, <strong>O</strong>wn every moment, <strong>L</strong>ead with care, <strong>D</strong>o it together.
+            Think: <em>&ldquo;Validate feelings first. Own the outcome. Lead with care.&rdquo;</em>
           </p>
         </div>
       </div>

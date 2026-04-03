@@ -1,104 +1,214 @@
 import type { ScoringResult } from '@/types';
 
-// ─── Phrase lists ─────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const EMPATHY_STRONG = [
-  "i completely understand",
-  "i fully understand",
-  "i truly understand",
-  "i can only imagine",
-  "i can hear how",
-  "i can see how",
-  "i can see why",
-  "that must be",
-  "must feel",
-  "you must be",
-  "i'm so sorry",
-  "i am so sorry",
-  "deeply sorry",
-  "sincerely apologize",
-  "i sincerely",
-  "i genuinely",
-  "i truly",
-  "you deserve better",
-  "you shouldn't have to",
-  "you should never have",
-  "that's completely understandable",
-  "that is completely understandable",
-  "i take full",
-  "i take personal",
-  "i personally",
-  "i want to make this right",
-  "let me make this right",
-  "i'll make sure",
-  "i will make sure",
-  "feel heard",
-  "feel valued",
+function countRegexHits(text: string, patterns: RegExp[]): number {
+  return patterns.filter((p) => p.test(text)).length;
+}
+
+function countPhraseHits(text: string, phrases: string[]): number {
+  return phrases.filter((p) => text.includes(p)).length;
+}
+
+// ─── G — Go Beyond the Ask: Empathy ──────────────────────────────────────────
+
+// Regex patterns — catch natural variations and synonyms in one pattern
+const EMPATHY_REGEX: RegExp[] = [
+  // Acknowledgment with intensifier
+  /i\s+(completely|truly|fully|genuinely|deeply|sincerely|really|absolutely|totally)\s+understand/,
+  // Core understanding variations
+  /i\s+(can\s+)?(hear|see|feel|sense)\s+(how|that|what)\s+\w/,
+  /i\s+can\s+only\s+imagine\s+how/,
+  // "That must be / feel / have been"
+  /that\s+must\s+(be|feel|seem|have\s+been)/,
+  // Naming the emotion in context
+  /how\s+(frustrating|disappointing|upsetting|stressful|difficult|confusing|infuriating|exhausting)\s+(this|that)\s+(must|is|was|sounds|seems)/,
+  /(this|that)\s+(is|sounds|seems|must\s+be)\s+(so\s+)?(frustrating|disappointing|upsetting|stressful|difficult|infuriating|exhausting)/,
+  // Apology variants
+  /i('m|\s+am)\s+(so\s+|truly\s+|deeply\s+|sincerely\s+|genuinely\s+)?sorry/,
+  /i\s+(sincerely|deeply|humbly|truly)\s+apologize/,
+  // Validation phrases
+  /(that'?s?|this\s+is)\s+(completely|totally|absolutely|perfectly|entirely|100%)\s+(understandable|valid|fair|reasonable)/,
+  /you\s+(have\s+every\s+right|shouldn'?t\s+have\s+to|deserve\s+better|didn'?t\s+deserve)/,
+  /your\s+(frustration|concern|disappointment|confusion|feelings?)\s+(is|are|makes?)\s+(completely|totally|absolutely|perfectly)?\s*(valid|understandable|justified|fair)/,
+  // Making it right
+  /i\s+(want|need|intend)\s+to\s+make\s+this\s+right/,
+  /let\s+me\s+make\s+this\s+right/,
+  // Direct emotional acknowledgment
+  /i\s+(acknowledge|recognize|validate|hear)\s+(your|this|that|how)/,
+  /you\s+(feel|felt)\s+(heard|valued|understood|seen)/,
+  /that\s+(is|was)\s+(not\s+okay|unacceptable|not\s+right|not\s+how)/,
 ];
 
-const EMPATHY_MODERATE = [
+// Exact phrases — common, concise expressions worth catching literally
+const EMPATHY_PHRASES: string[] = [
   "i understand",
   "i can understand",
-  "i apologize",
-  "i'm sorry",
-  "i am sorry",
   "i hear you",
   "you're right",
   "you are right",
+  "i apologize",
+  "i'm sorry",
+  "i am sorry",
   "that's frustrating",
   "that is frustrating",
   "that's disappointing",
   "that is disappointing",
-  "frustrating",
-  "disappointing",
-  "upsetting",
-  "i acknowledge",
-  "i recognize",
-  "i understand your frustration",
-  "completely valid",
-  "your feelings",
-  "your concern",
-  "your experience",
   "i know how",
   "this must",
   "how difficult",
+  "your experience",
+  "your feelings",
+  "your concern",
+  "completely valid",
+  "that's understandable",
+  "that is understandable",
+  "i empathize",
 ];
 
-const TONE_POSITIVE = [
+// Single concept words — lighter signal, each counts as ~0.5 of a phrase hit
+const EMPATHY_CONCEPT_WORDS: string[] = [
+  "frustrating", "frustrated", "frustration",
+  "disappointing", "disappointed", "disappointment",
+  "upsetting", "upset",
+  "confusing", "confused", "confusion",
+  "stressful", "stressed",
+  "exhausting", "exhausted",
+  "empathize", "empathy",
+  "validate", "validated",
+  "acknowledge", "acknowledged",
+];
+
+// ─── L — Lead with Care: Tone ─────────────────────────────────────────────────
+
+const TONE_REGEX: RegExp[] = [
+  // Commitment to help
+  /(i'?d?\s+love|i\s+would\s+love|i'?m\s+happy|i\s+am\s+happy)\s+to\s+help/,
+  /\b(here|happy|glad|pleased)\s+to\s+help\b/,
+  /let\s+me\s+(help|assist|take\s+care|sort\s+this|get\s+this)/,
+  // Appreciation
+  /thank\s+you\s+for\s+(bringing|reaching|contacting|your|letting|taking)/,
+  /i\s+(appreciate|value)\s+(you|your|this|that)/,
+  // Priority language
+  /(top|first|high|my)\s+priority/,
+  /as\s+a\s+priority/,
+  /right\s+(away|now|this\s+moment)/,
+  /\bimmediately\b/,
+  // Affirming tone
+  /\b(certainly|absolutely|of\s+course|definitely|absolutely)\b/,
+  // Customer value language
+  /(you\s+are|you'?re)\s+a?\s*(valued|important|our\s+priority)/,
+  /we\s+(value|care\s+about)\s+you/,
+  /your\s+trust\s+(means|is\s+important)/,
+  // Warm forward-looking language
+  /(going|moving)\s+forward/,
+  /\brebuild\b|\brestore\b/,
+  // Collaborative
+  /\btogether\b/,
+  /\bpartner\b|\bside\s+by\s+side\b/,
+  // Personal warmth
+  /please\s+know/,
+  /i\s+want\s+you\s+to\s+know/,
+  /i\s+care\s+about\s+(you|this|your)/,
+];
+
+const TONE_PHRASES: string[] = [
   "happy to help",
   "here to help",
-  "let me help",
   "i'd love to",
   "i would love to",
-  "we want to make this right",
   "make this right",
+  "thank you for",
+  "we value",
+  "you are valued",
+  "of course",
+  "certainly",
+  "absolutely",
   "right away",
   "immediately",
   "top priority",
-  "first priority",
-  "as a priority",
-  "certainly",
-  "absolutely",
-  "of course",
-  "thank you for",
-  "appreciate your",
-  "we value",
-  "you are valued",
-  "you're a valued",
-  "together",
-  "personally",
-  "personally ensure",
-  "i will personally",
-  "i'll personally",
-  "we can",
-  "i can",
-  "let me",
-  "allow me",
   "please know",
   "want you to know",
+  "going forward",
+  "moving forward",
+  "together",
+  "i care about",
 ];
 
-const PENALTY_PHRASES = [
+// ─── O+D — Own Every Moment + Do It Together: Ownership ───────────────────────
+
+const OWNERSHIP_REGEX: RegExp[] = [
+  // Personal ownership with action
+  /i\s+('?ll|will)\s+personally\s+\w/,
+  /let\s+me\s+personally\s+\w/,
+  /i\s+personally\s+(will|want|commit|ensure|guarantee|promise)/,
+  // Taking full responsibility
+  /i\s+take\s+(full|complete|total|personal|ownership|responsibility)/,
+  /i\s+(own|accept)\s+(this|that|full|complete)\s*(responsibility|outcome|issue)?/,
+  // Specific commitment structures
+  /here'?s?\s+(what|my plan|my next step)/,
+  /what\s+i\s+('?ll|will|can)\s+do\s+(is|for\s+you|right\s+now)/,
+  // Personal follow-through
+  /i\s+('?ll|will)\s+(follow\s+up|check\s+back|reach\s+out|get\s+back|update\s+you|keep\s+you\s+posted)/,
+  /i\s+('?ll|will)\s+see\s+this\s+through/,
+  /i\s+won'?t\s+(stop|rest|let\s+this)/,
+  // Specific action commitment
+  /i\s+('?ll|will)\s+(take\s+care|handle|resolve|fix|address|look\s+into|investigate|get\s+this)/,
+  // Promise language
+  /\b(you\s+have\s+my\s+word|i\s+promise|i\s+commit|i\s+guarantee)\b/,
+  // Going above and beyond
+  /(go|going)\s+above\s+and\s+beyond/,
+  /extra\s+mile/,
+  // Next steps
+  /\bnext\s+step(s)?\b/,
+  /my\s+next\s+step/,
+  // Follow through commitment
+  /follow\s+through/,
+];
+
+const OWNERSHIP_PHRASES: string[] = [
+  "i'll look into",
+  "i will look into",
+  "let me check",
+  "i'll find out",
+  "i will find out",
+  "i'll get this resolved",
+  "i'll resolve",
+  "i'll update you",
+  "i'll keep you posted",
+  "i'll handle",
+  "i'll work on",
+  "we'll fix this",
+  "we will fix this",
+  "let's get this sorted",
+  "get this sorted",
+  "i'll do my best",
+  "let me see what",
+  "i can do for you",
+  "work together",
+  "i'll take care",
+  "i will take care",
+  "i'll make sure",
+  "i will make sure",
+  "follow through",
+];
+
+const OWNERSHIP_CONCEPT_WORDS: string[] = [
+  "accountable", "accountability",
+  "responsible", "responsibility",
+  "committed", "commitment",
+  "dedicated", "dedication",
+  "promise", "promised",
+  "ensure", "ensuring",
+  "guarantee", "guaranteeing",
+  "resolve", "resolving", "resolution",
+  "own", "ownership",
+  "personally",
+];
+
+// ─── Penalty patterns ─────────────────────────────────────────────────────────
+
+const PENALTY_PHRASES: string[] = [
   "per our policy",
   "as per",
   "as stated",
@@ -128,6 +238,15 @@ const PENALTY_PHRASES = [
   "i already told you",
 ];
 
+const PENALTY_REGEX: RegExp[] = [
+  // Negated empathy — "I don't understand why you're upset"
+  /i\s+(don'?t|cannot|can'?t|do\s+not)\s+understand\s+why\s+you/,
+  // Dismissive redirects
+  /not\s+(my|our)\s+(fault|problem|issue|responsibility)/,
+  // Blaming the customer
+  /you\s+(should\s+have|shouldn'?t\s+have|were\s+supposed\s+to|need\s+to\s+have)/,
+];
+
 // ─── Scorer ───────────────────────────────────────────────────────────────────
 
 export function scoreHeuristic(
@@ -137,108 +256,136 @@ export function scoreHeuristic(
   const text = responseText.toLowerCase().trim();
   const wordCount = text.split(/\s+/).filter(Boolean).length;
 
-  // --- Empathy scoring
-  const strongHits = EMPATHY_STRONG.filter((p) => text.includes(p)).length;
-  const moderateHits = EMPATHY_MODERATE.filter((p) => text.includes(p)).length;
+  // --- G: Empathy scoring
+  const empathyRegexHits  = countRegexHits(text, EMPATHY_REGEX);
+  const empathyPhraseHits = countPhraseHits(text, EMPATHY_PHRASES);
+  // Concept words count as 0.5 each — use Math.floor(n/2) to convert to whole hits
+  const empathyConceptBonus = Math.floor(countPhraseHits(text, EMPATHY_CONCEPT_WORDS) / 2);
+  const empathyTotal = empathyRegexHits + empathyPhraseHits + empathyConceptBonus;
 
   let empathyScore = 1;
-  if (strongHits >= 3 || (strongHits >= 2 && moderateHits >= 2)) {
-    empathyScore = 5;
-  } else if (strongHits >= 2 || (strongHits >= 1 && moderateHits >= 2)) {
-    empathyScore = 4;
-  } else if (strongHits >= 1 || moderateHits >= 3) {
-    empathyScore = 3;
-  } else if (moderateHits >= 1) {
-    empathyScore = 2;
-  }
+  if (empathyTotal >= 4)      empathyScore = 5;
+  else if (empathyTotal >= 3) empathyScore = 4;
+  else if (empathyTotal >= 2) empathyScore = 3;
+  else if (empathyTotal >= 1) empathyScore = 2;
 
-  // --- Tone scoring
-  const toneHits = TONE_POSITIVE.filter((p) => text.includes(p)).length;
+  // --- L: Tone scoring
+  const toneRegexHits  = countRegexHits(text, TONE_REGEX);
+  const tonePhraseHits = countPhraseHits(text, TONE_PHRASES);
+  const toneTotal = toneRegexHits + tonePhraseHits;
 
   let toneScore = 1;
-  if (toneHits >= 4) {
-    toneScore = 5;
-  } else if (toneHits >= 3) {
-    toneScore = 4;
-  } else if (toneHits >= 2) {
-    toneScore = 3;
-  } else if (toneHits >= 1 || wordCount >= 40) {
-    toneScore = 2;
-  }
+  if (toneTotal >= 5)      toneScore = 5;
+  else if (toneTotal >= 4) toneScore = 4;
+  else if (toneTotal >= 2) toneScore = 3;
+  else if (toneTotal >= 1 || wordCount >= 40) toneScore = 2;
+
+  // --- O+D: Ownership scoring
+  const ownershipRegexHits  = countRegexHits(text, OWNERSHIP_REGEX);
+  const ownershipPhraseHits = countPhraseHits(text, OWNERSHIP_PHRASES);
+  const ownershipConceptBonus = Math.floor(countPhraseHits(text, OWNERSHIP_CONCEPT_WORDS) / 2);
+  const ownershipTotal = ownershipRegexHits + ownershipPhraseHits + ownershipConceptBonus;
+
+  let ownershipScore = 1;
+  if (ownershipTotal >= 4)      ownershipScore = 5;
+  else if (ownershipTotal >= 3) ownershipScore = 4;
+  else if (ownershipTotal >= 2) ownershipScore = 3;
+  else if (ownershipTotal >= 1) ownershipScore = 2;
 
   // --- Penalties
-  const penaltyHits = PENALTY_PHRASES.filter((p) => text.includes(p)).length;
-  empathyScore = Math.max(1, empathyScore - penaltyHits);
-  toneScore = Math.max(1, toneScore - penaltyHits);
+  const penaltyPhraseHits = countPhraseHits(text, PENALTY_PHRASES);
+  const penaltyRegexHits  = countRegexHits(text, PENALTY_REGEX);
+  const penaltyTotal = penaltyPhraseHits + penaltyRegexHits;
+
+  empathyScore   = Math.max(1, empathyScore   - penaltyTotal);
+  toneScore      = Math.max(1, toneScore      - penaltyTotal);
+  ownershipScore = Math.max(1, ownershipScore - penaltyTotal);
 
   // --- Length check
   if (wordCount < 15) {
-    empathyScore = Math.max(1, empathyScore - 1);
-    toneScore = Math.max(1, toneScore - 1);
+    empathyScore   = Math.max(1, empathyScore   - 1);
+    toneScore      = Math.max(1, toneScore      - 1);
+    ownershipScore = Math.max(1, ownershipScore - 1);
   }
 
   // --- Caps
-  empathyScore = Math.min(5, Math.max(1, empathyScore));
-  toneScore = Math.min(5, Math.max(1, toneScore));
+  empathyScore   = Math.min(5, Math.max(1, empathyScore));
+  toneScore      = Math.min(5, Math.max(1, toneScore));
+  ownershipScore = Math.min(5, Math.max(1, ownershipScore));
 
-  const totalScore = empathyScore + toneScore;
+  const totalScore = empathyScore + toneScore + ownershipScore;
   const bonusMultiplier = isBonus ? 2 : 1;
   const finalScore = totalScore * bonusMultiplier;
 
-  const feedback = buildFeedback(empathyScore, toneScore, strongHits, moderateHits, penaltyHits);
-  const improvementTip = buildTip(empathyScore, toneScore, wordCount);
+  const feedback = buildFeedback(empathyScore, toneScore, ownershipScore, penaltyTotal);
+  const improvementTip = buildTip(empathyScore, toneScore, ownershipScore, wordCount);
 
-  return { empathyScore, toneScore, totalScore, finalScore, feedback, improvementTip };
+  return { empathyScore, toneScore, ownershipScore, totalScore, finalScore, feedback, improvementTip };
 }
 
 function buildFeedback(
   empathy: number,
   tone: number,
-  strong: number,
-  moderate: number,
+  ownership: number,
   penalties: number,
 ): string {
   const parts: string[] = [];
 
   if (empathy >= 4) {
-    parts.push('Strong empathy — you clearly acknowledged the customer\'s emotions.');
+    parts.push('Strong empathy — you went beyond the ask by clearly acknowledging the customer\'s emotions and making them feel seen.');
   } else if (empathy === 3) {
-    parts.push('Moderate empathy — you showed some acknowledgment, but could dig deeper into the feeling.');
+    parts.push('Moderate empathy — you acknowledged the feeling, but going deeper into the specific emotion would truly go beyond the ask.');
   } else if (empathy === 2) {
-    parts.push('Light empathy — there\'s a hint of acknowledgment, but the emotional connection is thin.');
+    parts.push('Light empathy — there\'s a hint of acknowledgment, but the emotional connection is thin. Go beyond surface-level.');
   } else {
-    parts.push('Empathy was missing — the response jumped to solution or policy without validating the customer first.');
+    parts.push('Empathy was missing — the response jumped to solution without validating the customer first. Feelings first, solutions second.');
   }
 
   if (tone >= 4) {
-    parts.push('The tone is warm and professional — this response would make a customer feel valued.');
+    parts.push('You led with care — the tone is warm, human, and professional. This response would make a customer feel truly valued.');
   } else if (tone === 3) {
-    parts.push('The tone is decent but a bit neutral — a bit more warmth would elevate it.');
+    parts.push('Decent tone, but a little neutral. More warmth and personal language would help you lead with care more effectively.');
   } else if (tone === 2) {
-    parts.push('The tone could be warmer — aim for conversational and human over formal or procedural.');
+    parts.push('The tone could be warmer. Leading with care means sounding human and personal, not formal or procedural.');
   } else {
-    parts.push('The tone feels flat or robotic — try more personal, warm language.');
+    parts.push('The tone feels flat. Lead with care by using warmer, more conversational language that puts the customer first.');
+  }
+
+  if (ownership >= 4) {
+    parts.push('Excellent ownership — you clearly took personal responsibility and showed the customer you\'re in this together.');
+  } else if (ownership === 3) {
+    parts.push('Good ownership, but be more specific about what you\'ll personally do and when. Own every moment by making concrete commitments.');
+  } else if (ownership === 2) {
+    parts.push('Ownership was light. Add a clear next step and personal commitment — "Here\'s what I\'ll do..." goes a long way.');
+  } else {
+    parts.push('Ownership was missing. The GOLD Standard means owning the outcome — commit to a specific action and follow through together.');
   }
 
   if (penalties > 0) {
-    parts.push('Watch out for defensive or policy-first phrasing — it undermines the empathy you\'ve built.');
+    parts.push('Watch out for defensive or policy-first phrasing — it undermines the GOLD Standard and breaks trust with the customer.');
   }
 
   return parts.join(' ');
 }
 
-function buildTip(empathy: number, tone: number, wordCount: number): string {
+function buildTip(empathy: number, tone: number, ownership: number, wordCount: number): string {
   if (wordCount < 20) {
-    return 'Your response was quite short. A fuller response (2–4 sentences) shows the customer you\'re genuinely engaged.';
+    return 'Your response was too brief. A full 2–4 sentence response shows the customer you\'re genuinely engaged and living the GOLD Standard.';
   }
   if (empathy < 3) {
-    return 'Lead with the feeling first. Try opening with: "I completely understand how [emotion] this must be..."';
+    return 'G — Go Beyond the Ask: Lead with the feeling first. Try: "I completely understand how [emotion] this must be, and I want to make sure we get this right for you."';
+  }
+  if (ownership < 3) {
+    return 'O — Own Every Moment: Add a personal commitment. Try: "Here\'s what I\'ll personally do to make this right..." — specific ownership builds trust.';
   }
   if (tone < 3) {
-    return 'Warm up your language. Phrases like "I\'d love to help get this resolved" or "Let me take care of this personally" go a long way.';
+    return 'L — Lead with Care: Warm up your language. Phrases like "I\'d love to help" or "Let me take care of this personally" show you lead with care.';
   }
   if (empathy === 3) {
-    return 'Try naming the specific emotion (frustration, disappointment, confusion) to make the empathy feel more genuine.';
+    return 'G — Go Beyond the Ask: Name the specific emotion (frustration, disappointment, confusion) to make the empathy feel genuine and personal.';
   }
-  return 'Great work! To push to a 10, consider adding a brief commitment to follow through — show the customer what happens next.';
+  if (ownership === 3) {
+    return 'D — Do It Together: Close the loop by showing the customer you\'re partnering with them — "Let\'s get this resolved together" signals teamwork.';
+  }
+  return 'Strong GOLD response! To reach a perfect 15, make sure you\'ve named the emotion, committed to a specific next step, and ended with a warm collaborative close.';
 }

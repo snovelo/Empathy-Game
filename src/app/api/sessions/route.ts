@@ -44,20 +44,50 @@ export async function POST(req: NextRequest) {
 
   const data = parsed.data;
 
-  // Load all rounds to create session rounds
-  const rounds = await prisma.round.findMany({ orderBy: { orderIndex: 'asc' } });
-  if (rounds.length === 0) {
+  // Load all rounds and build a randomized session structure
+  const allRounds = await prisma.round.findMany({ orderBy: { orderIndex: 'asc' } });
+  if (allRounds.length === 0) {
     return NextResponse.json(
       { error: 'No rounds found. Run `npm run db:seed` first.' },
       { status: 500 },
     );
   }
 
+  // Separate into pools by category and bonus status
+  const shuffle = <T>(arr: T[]): T[] => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const pick = <T>(arr: T[], n: number): T[] => shuffle(arr).slice(0, n);
+
+  const standardPool = allRounds.filter((r) => r.category === 'standard' && !r.isBonus);
+  const complexPool = allRounds.filter((r) => r.category === 'complex' && !r.isBonus);
+  const deescalPool = allRounds.filter((r) => r.category === 'de-escalation' && !r.isBonus);
+  const bonusStandard = allRounds.filter((r) => r.isBonus && r.category === 'standard');
+  const bonusComplex = allRounds.filter((r) => r.isBonus && r.category === 'complex');
+  const bonusDeescal = allRounds.filter((r) => r.isBonus && r.category === 'de-escalation');
+
+  // Pick from each pool (fall back to full list if pool is too small)
+  const std = pick(standardPool.length >= 2 ? standardPool : allRounds.filter((r) => !r.isBonus), 2);
+  const bs = pick(bonusStandard.length >= 1 ? bonusStandard : allRounds.filter((r) => r.isBonus), 1);
+  const cpx = pick(complexPool.length >= 3 ? complexPool : allRounds.filter((r) => !r.isBonus), 3);
+  const bc = pick(bonusComplex.length >= 1 ? bonusComplex : allRounds.filter((r) => r.isBonus), 1);
+  const de = pick(deescalPool.length >= 2 ? deescalPool : allRounds.filter((r) => !r.isBonus), 2);
+  const bd = pick(bonusDeescal.length >= 1 ? bonusDeescal : allRounds.filter((r) => r.isBonus), 1);
+
+  // Interleave: [std, std, bonus(std), cpx, cpx, cpx, bonus(cpx), de-escal, de-escal, bonus(de-escal)]
+  const selectedRounds = [std[0], std[1], bs[0], cpx[0], cpx[1], cpx[2], bc[0], de[0], de[1], bd[0]]
+    .filter(Boolean);
+
   const session = await prisma.session.create({
     data: {
       code: generateCode(),
       adminKey: generateSecretKey(),
-      title: data.title ?? 'The Empathy Game',
+      title: data.title ?? 'The GOLD Standard Game',
       timerEnabled: data.timerEnabled ?? false,
       timerDuration: data.timerDuration ?? 120,
       anonymousMode: data.anonymousMode ?? false,
@@ -65,9 +95,9 @@ export async function POST(req: NextRequest) {
       allowEdits: data.allowEdits ?? true,
       revealAfterEach: data.revealAfterEach ?? true,
       sessionRounds: {
-        create: rounds.map((r) => ({
+        create: selectedRounds.map((r, idx) => ({
           roundId: r.id,
-          orderIndex: r.orderIndex,
+          orderIndex: idx,
         })),
       },
     },

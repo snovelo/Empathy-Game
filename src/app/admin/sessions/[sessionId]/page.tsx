@@ -14,6 +14,7 @@ interface Submission {
   responseText: string;
   empathyScore: number | null;
   toneScore: number | null;
+  ownershipScore: number | null;
   totalScore: number | null;
   finalScore: number | null;
   bonusMultiplier: number;
@@ -156,19 +157,19 @@ export default function AdminDashboardPage() {
   const leaderboard = buildLeaderboard(allSubmissions);
 
   const statusColors: Record<string, string> = {
-    WAITING: 'bg-slate-100 text-slate-700 border-slate-200',
-    ACTIVE: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    PAUSED: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    COMPLETED: 'bg-brand-100 text-brand-700 border-brand-200',
+    WAITING: 'bg-slate-800 text-slate-300 border-slate-700',
+    ACTIVE: 'bg-emerald-900/40 text-emerald-400 border-emerald-700/50',
+    PAUSED: 'bg-yellow-900/40 text-yellow-400 border-yellow-700/50',
+    COMPLETED: 'bg-brand-500/20 text-brand-300 border-brand-500/40',
   };
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-dark-950">
       {/* Sticky top bar */}
-      <header className="sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm">
+      <header className="sticky top-0 z-10 bg-dark-900 border-b border-slate-800 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <h1 className="font-bold text-slate-900">{session.title}</h1>
+            <h1 className="font-bold text-white">{session.title}</h1>
             <span className={cn('text-xs px-2 py-0.5 rounded-full border font-semibold', statusColors[session.status])}>
               {session.status}
             </span>
@@ -177,7 +178,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={copyJoinLink}
-              className="text-xs bg-brand-50 text-brand-700 border border-brand-200 px-3 py-1.5 rounded-lg font-mono font-semibold hover:bg-brand-100 transition-colors"
+              className="text-xs bg-brand-500/10 text-brand-300 border border-brand-500/30 px-3 py-1.5 rounded-lg font-mono font-semibold hover:bg-brand-500/20 transition-colors"
             >
               {copySuccess ? '✓ Copied!' : `Code: ${session.code}`}
             </button>
@@ -219,7 +220,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Tabs */}
-        <div className="max-w-5xl mx-auto px-4 flex gap-1 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4 flex gap-1 border-t border-slate-800">
           {(['overview', 'submissions', 'leaderboard'] as AdminTab[]).map((t) => (
             <button
               key={t}
@@ -227,8 +228,8 @@ export default function AdminDashboardPage() {
               className={cn(
                 'px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors capitalize',
                 tab === t
-                  ? 'border-brand-600 text-brand-700'
-                  : 'border-transparent text-slate-500 hover:text-slate-700',
+                  ? 'border-brand-500 text-brand-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-300',
               )}
             >
               {t}
@@ -243,7 +244,7 @@ export default function AdminDashboardPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Session info */}
             <Card>
-              <h2 className="font-bold text-slate-900 mb-4">Session Info</h2>
+              <h2 className="font-bold text-white mb-4">Session Info</h2>
               <dl className="space-y-2 text-sm">
                 {[
                   { label: 'Code', value: session.code },
@@ -259,9 +260,9 @@ export default function AdminDashboardPage() {
                   { label: 'Participants', value: session.participants.length },
                   { label: 'Submissions', value: allSubmissions.length },
                 ].map(({ label, value }) => (
-                  <div key={label} className="flex justify-between py-1.5 border-b border-slate-100">
+                  <div key={label} className="flex justify-between py-1.5 border-b border-slate-800">
                     <dt className="text-slate-500">{label}</dt>
-                    <dd className="font-medium text-slate-900">{value}</dd>
+                    <dd className="font-medium text-slate-200">{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -271,7 +272,7 @@ export default function AdminDashboardPage() {
             {currentSR && (
               <Card variant={currentSR.round.isBonus ? 'bonus' : 'default'}>
                 <div className="flex items-center gap-2 mb-3">
-                  <h2 className="font-bold text-slate-900">Current Round</h2>
+                  <h2 className="font-bold text-white">Current Round</h2>
                   {currentSR.round.isBonus && <Badge variant="bonus">⚡ Bonus</Badge>}
                   <Badge
                     variant={currentSR.status === 'ACTIVE' ? 'success' : 'default'}
@@ -280,12 +281,12 @@ export default function AdminDashboardPage() {
                     {currentSR.status}
                   </Badge>
                 </div>
-                <p className="font-semibold text-slate-800 mb-2">{currentSR.round.title}</p>
-                <p className="text-sm text-slate-600 mb-3 italic">
+                <p className="font-semibold text-slate-200 mb-2">{currentSR.round.title}</p>
+                <p className="text-sm text-slate-400 mb-3 italic">
                   {currentSR.round.scenario.slice(0, 120)}…
                 </p>
                 {currentSR.round.facilitatorNote && (
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
+                  <div className="bg-brand-950/40 border border-brand-700/40 rounded-lg p-3 text-xs text-brand-300">
                     <strong>Facilitator note:</strong> {currentSR.round.facilitatorNote}
                   </div>
                 )}
@@ -297,11 +298,11 @@ export default function AdminDashboardPage() {
 
             {/* Participants */}
             <Card className="md:col-span-2">
-              <h2 className="font-bold text-slate-900 mb-4">
+              <h2 className="font-bold text-white mb-4">
                 Participants ({session.participants.length})
               </h2>
               {session.participants.length === 0 ? (
-                <p className="text-slate-400 text-sm">No participants yet.</p>
+                <p className="text-slate-500 text-sm">No participants yet.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {session.participants.map((p) => (
@@ -309,7 +310,7 @@ export default function AdminDashboardPage() {
                       <span className={cn('text-xs px-2.5 py-1 rounded-full border font-medium', teamColor(p.teamName))}>
                         {p.teamName}
                       </span>
-                      <span className="text-sm text-slate-700">{p.displayName}</span>
+                      <span className="text-sm text-slate-300">{p.displayName}</span>
                     </div>
                   ))}
                 </div>
@@ -322,14 +323,14 @@ export default function AdminDashboardPage() {
         {tab === 'submissions' && (
           <div className="space-y-6">
             {session.sessionRounds.map((sr) => (
-              <div key={sr.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div key={sr.id} className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm overflow-hidden">
                 <div className={cn(
                   'flex items-center justify-between px-5 py-3 border-b',
-                  sr.round.isBonus ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-100',
+                  sr.round.isBonus ? 'bg-brand-950/30 border-brand-800/40' : 'bg-slate-800 border-slate-700',
                 )}>
                   <div className="flex items-center gap-2">
                     {sr.round.isBonus && <Badge variant="bonus">⚡</Badge>}
-                    <h3 className="font-semibold text-slate-900 text-sm">{sr.round.title}</h3>
+                    <h3 className="font-semibold text-white text-sm">{sr.round.title}</h3>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={sr.status === 'ACTIVE' ? 'success' : sr.status === 'CLOSED' ? 'default' : 'warning'}>
@@ -340,35 +341,35 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {sr.submissions.length === 0 ? (
-                  <p className="px-5 py-4 text-slate-400 text-sm">No submissions yet.</p>
+                  <p className="px-5 py-4 text-slate-500 text-sm">No submissions yet.</p>
                 ) : (
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-slate-800">
                     {sr.submissions.map((sub) => (
                       <div key={sub.id} className="px-5 py-4">
                         <div className="flex items-start justify-between gap-4 mb-2">
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-semibold text-slate-900 text-sm">
+                              <span className="font-semibold text-white text-sm">
                                 {sub.participant.displayName}
                               </span>
                               <span className={cn('text-xs px-2 py-0.5 rounded-full border', teamColor(sub.participant.teamName))}>
                                 {sub.participant.teamName}
                               </span>
                               {sub.manualOverride && (
-                                <span className="text-xs text-amber-600">✏️ edited</span>
+                                <span className="text-xs text-brand-400">✏️ edited</span>
                               )}
                             </div>
-                            <p className="text-xs text-slate-400 mt-0.5">{formatDate(sub.submittedAt)}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{formatDate(sub.submittedAt)}</p>
                           </div>
                           {sub.finalScore != null && (
                             <div className="text-right shrink-0">
-                              <span className="text-lg font-bold text-slate-900">{sub.finalScore}</span>
-                              <span className="text-xs text-slate-400 ml-1">pts</span>
+                              <span className="text-lg font-bold text-brand-400">{sub.finalScore}</span>
+                              <span className="text-xs text-slate-500 ml-1">pts</span>
                             </div>
                           )}
                         </div>
 
-                        <blockquote className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-3 leading-relaxed">
+                        <blockquote className="text-sm text-slate-300 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mb-3 leading-relaxed">
                           {sub.responseText}
                         </blockquote>
 
@@ -377,6 +378,7 @@ export default function AdminDashboardPage() {
                             <ScoreDisplay
                               empathyScore={sub.empathyScore}
                               toneScore={sub.toneScore!}
+                              ownershipScore={sub.ownershipScore ?? 1}
                               totalScore={sub.totalScore!}
                               finalScore={sub.finalScore!}
                               isBonus={sr.round.isBonus}
@@ -389,7 +391,7 @@ export default function AdminDashboardPage() {
 
                         {/* Override button */}
                         <button
-                          className="text-xs text-brand-600 hover:text-brand-800 font-medium"
+                          className="text-xs text-brand-400 hover:text-brand-300 font-medium"
                           onClick={() =>
                             setOverrideState({
                               submissionId: sub.id,
@@ -414,7 +416,7 @@ export default function AdminDashboardPage() {
         {tab === 'leaderboard' && (
           <div className="max-w-lg mx-auto">
             <Card>
-              <h2 className="font-bold text-slate-900 mb-4">Team Leaderboard</h2>
+              <h2 className="font-bold text-white mb-4">Team Leaderboard</h2>
               <Leaderboard entries={leaderboard} showWinner={session.status === 'COMPLETED'} />
             </Card>
           </div>
@@ -429,11 +431,11 @@ export default function AdminDashboardPage() {
           aria-modal="true"
           aria-label="Override score"
         >
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 w-full max-w-sm animate-slide-up">
-            <h3 className="font-bold text-slate-900 mb-4">Override Score</h3>
+          <div className="bg-slate-900 rounded-2xl border border-slate-700 shadow-xl p-6 w-full max-w-sm animate-slide-up">
+            <h3 className="font-bold text-white mb-4">Override Score</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
+                <label className="block text-sm font-semibold text-slate-300 mb-1">
                   Empathy Score (1–5)
                 </label>
                 <input
@@ -444,18 +446,18 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setOverrideState((s) => s && { ...s, empathy: Number(e.target.value) })
                   }
-                  className="w-full accent-brand-600"
+                  className="w-full accent-brand-500"
                 />
                 <div className="flex justify-between text-xs text-slate-500 mt-1">
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <span key={n} className={overrideState.empathy === n ? 'font-bold text-brand-600' : ''}>
+                    <span key={n} className={overrideState.empathy === n ? 'font-bold text-brand-400' : ''}>
                       {n}
                     </span>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
+                <label className="block text-sm font-semibold text-slate-300 mb-1">
                   Tone Score (1–5)
                 </label>
                 <input
@@ -466,30 +468,30 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setOverrideState((s) => s && { ...s, tone: Number(e.target.value) })
                   }
-                  className="w-full accent-brand-600"
+                  className="w-full accent-brand-500"
                 />
                 <div className="flex justify-between text-xs text-slate-500 mt-1">
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <span key={n} className={overrideState.tone === n ? 'font-bold text-brand-600' : ''}>
+                    <span key={n} className={overrideState.tone === n ? 'font-bold text-brand-400' : ''}>
                       {n}
                     </span>
                   ))}
                 </div>
               </div>
-              <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
-                <p className="text-sm text-slate-500">New total score</p>
-                <p className="text-2xl font-bold text-slate-900">
+              <div className="bg-slate-800 rounded-xl p-3 text-center border border-slate-700">
+                <p className="text-sm text-slate-400">New total score</p>
+                <p className="text-2xl font-bold text-brand-400">
                   {overrideState.empathy + overrideState.tone}
-                  <span className="text-sm text-slate-400">/10</span>
+                  <span className="text-sm text-slate-500">/10</span>
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
+                <label className="block text-sm font-semibold text-slate-300 mb-1">
                   Feedback (optional)
                 </label>
                 <textarea
                   rows={2}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none resize-none"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:ring-2 focus:ring-brand-500 focus:outline-none resize-none"
                   value={overrideState.feedback}
                   onChange={(e) =>
                     setOverrideState((s) => s && { ...s, feedback: e.target.value })

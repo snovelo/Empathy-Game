@@ -29,6 +29,7 @@ interface SessionRound {
     participantId: string;
     empathyScore: number | null;
     toneScore: number | null;
+    ownershipScore: number | null;
     totalScore: number | null;
     finalScore: number | null;
     bonusMultiplier: number;
@@ -183,7 +184,7 @@ export default function RoundPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-500">Loading game...</p>
+          <p className="text-slate-400">Loading game...</p>
         </div>
       </div>
     );
@@ -200,19 +201,19 @@ export default function RoundPage() {
   const allSubmissions = session.sessionRounds.flatMap((sr) => sr.submissions);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-brand-50 py-8 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-dark-950 via-slate-950 to-dark-900 py-8 px-4">
       <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
         {/* Header bar */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <div className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-semibold text-slate-700">
+            <div className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-sm font-semibold text-slate-200">
               Round {roundNum} of {totalRounds}
             </div>
             {round.isBonus && (
               <Badge variant="bonus">⚡ Bonus Round — 2× Points</Badge>
             )}
           </div>
-          <div className="text-sm text-slate-500">
+          <div className="text-sm text-slate-400">
             {currentSR.submissions.length} response{currentSR.submissions.length !== 1 && 's'} in
           </div>
         </div>
@@ -229,33 +230,33 @@ export default function RoundPage() {
         <Card variant={round.isBonus ? 'bonus' : 'default'}>
           <div className="space-y-4">
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">
                 {round.isBonus ? '⚡ Bonus — Make It Human' : 'Customer Scenario'}
               </p>
-              <h2 className="text-xl font-bold text-slate-900">{round.title}</h2>
+              <h2 className="text-xl font-bold text-white">{round.title}</h2>
             </div>
 
             {/* Customer quote */}
-            <blockquote className="border-l-4 border-brand-400 pl-4 italic text-slate-700 leading-relaxed bg-brand-50 py-3 pr-4 rounded-r-xl">
+            <blockquote className="border-l-4 border-brand-500 pl-4 italic text-slate-200 leading-relaxed bg-brand-950/30 py-3 pr-4 rounded-r-xl">
               {round.scenario}
             </blockquote>
 
             {/* Robotic response for bonus rounds */}
             {round.roboticResponse && (
-              <div className="bg-slate-100 rounded-xl p-4 border border-slate-200">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+              <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
                   🤖 Robotic Response to Rewrite
                 </p>
-                <p className="text-sm text-slate-600 italic">{round.roboticResponse}</p>
+                <p className="text-sm text-slate-400 italic">{round.roboticResponse}</p>
               </div>
             )}
 
             {/* Task */}
-            <div className="bg-white rounded-xl p-4 border border-dashed border-slate-300">
-              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide mb-1.5">
+            <div className="bg-slate-800 rounded-xl p-4 border border-dashed border-slate-700">
+              <p className="text-xs font-semibold text-brand-400 uppercase tracking-wide mb-1.5">
                 Your Task
               </p>
-              <p className="text-sm text-slate-700 whitespace-pre-line leading-relaxed">
+              <p className="text-sm text-slate-200 whitespace-pre-line leading-relaxed">
                 {round.task}
               </p>
             </div>
@@ -264,22 +265,22 @@ export default function RoundPage() {
 
         {/* Response area */}
         {phase === 'writing' && (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4 animate-slide-up">
+          <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6 space-y-4 animate-slide-up">
             <Textarea
               label="Your Response"
-              placeholder="Write an empathetic, warm response to this customer in 2–4 sentences..."
+              placeholder="Write a GOLD Standard response — acknowledge the feeling, own the outcome, and lead with care..."
               rows={6}
               value={response}
               onChange={(e) => setResponse(e.target.value)}
               maxLength={MAX_CHARS}
               charCount={response.length}
               maxChars={MAX_CHARS}
-              hint="Aim for 2–4 sentences. Validate the feeling first, then offer help."
+              hint="GOLD Standard: Go beyond, Own the moment, Lead with care, Do it together."
               disabled={submitting}
             />
 
             {submitError && (
-              <div role="alert" className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <div role="alert" className="text-sm text-red-400 bg-red-950/30 border border-red-800/50 rounded-xl px-4 py-3">
                 {submitError}
               </div>
             )}
@@ -298,21 +299,21 @@ export default function RoundPage() {
 
         {/* Submitted — awaiting round close */}
         {phase === 'submitted' && !mySubmission?.empathyScore && (
-          <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-6 text-center animate-slide-up">
+          <div className="bg-emerald-900/20 rounded-2xl border border-emerald-700/40 p-6 text-center animate-slide-up">
             <p className="text-3xl mb-2">✅</p>
-            <p className="text-emerald-800 font-bold text-lg">Response submitted!</p>
-            <p className="text-emerald-600 text-sm mt-1">
+            <p className="text-emerald-300 font-bold text-lg">Response submitted!</p>
+            <p className="text-emerald-400 text-sm mt-1">
               Hang tight — scores will be revealed when the round closes.
             </p>
-            <div className="mt-4 bg-white rounded-xl border border-slate-200 p-4 text-left">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
+            <div className="mt-4 bg-slate-900 rounded-xl border border-slate-800 p-4 text-left">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
                 Your response
               </p>
-              <p className="text-sm text-slate-700 leading-relaxed">{response}</p>
+              <p className="text-sm text-slate-200 leading-relaxed">{response}</p>
             </div>
             {session.allowEdits && (
               <button
-                className="mt-3 text-sm text-emerald-600 hover:text-emerald-800 font-medium underline"
+                className="mt-3 text-sm text-emerald-400 hover:text-emerald-300 font-medium underline"
                 onClick={() => setPhase('writing')}
               >
                 Edit response
@@ -324,12 +325,13 @@ export default function RoundPage() {
         {/* Scored */}
         {(phase === 'roundClosed' || phase === 'submitted') && mySubmission?.empathyScore != null && (
           <div className="space-y-6 animate-slide-up">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-              <h3 className="font-bold text-slate-900 mb-1">Your Score</h3>
-              <p className="text-sm text-slate-500 mb-4">Here&apos;s how your response scored on empathy and tone.</p>
+            <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6">
+              <h3 className="font-bold text-white mb-1">Your GOLD Score</h3>
+              <p className="text-sm text-slate-400 mb-4">Here&apos;s how your response scored on the GOLD Standard.</p>
               <ScoreDisplay
                 empathyScore={mySubmission.empathyScore!}
                 toneScore={mySubmission.toneScore!}
+                ownershipScore={mySubmission.ownershipScore ?? 1}
                 totalScore={mySubmission.totalScore!}
                 finalScore={mySubmission.finalScore!}
                 isBonus={round.isBonus}
@@ -341,8 +343,8 @@ export default function RoundPage() {
 
             {/* Leaderboard */}
             {session.revealAfterEach && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <h3 className="font-bold text-slate-900 mb-4">Team Leaderboard</h3>
+              <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6">
+                <h3 className="font-bold text-white mb-4">Team Leaderboard</h3>
                 <Leaderboard
                   entries={buildLeaderboard(allSubmissions)}
                   highlightTeam={participant?.teamName}
@@ -355,7 +357,7 @@ export default function RoundPage() {
         {/* Waiting for facilitator */}
         {phase === 'roundClosed' && (
           <div className="text-center py-4">
-            <div className="inline-flex items-center gap-2 bg-brand-50 text-brand-700 text-sm font-medium rounded-full px-4 py-2 border border-brand-200">
+            <div className="inline-flex items-center gap-2 bg-brand-500/10 text-brand-300 text-sm font-medium rounded-full px-4 py-2 border border-brand-500/30">
               <span className="w-2 h-2 rounded-full bg-brand-500 animate-ping-slow" />
               Waiting for facilitator to advance...
             </div>

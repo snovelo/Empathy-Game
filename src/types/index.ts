@@ -11,10 +11,11 @@ export interface SessionSettings {
 }
 
 export interface ScoringResult {
-  empathyScore: number; // 1–5
-  toneScore: number; // 1–5
-  totalScore: number; // empathy + tone
-  finalScore: number; // totalScore * bonusMultiplier
+  empathyScore: number;    // 1–5
+  toneScore: number;       // 1–5
+  ownershipScore: number;  // 1–5
+  totalScore: number;      // empathy + tone + ownership (3–15)
+  finalScore: number;      // totalScore * bonusMultiplier
   feedback: string;
   improvementTip: string;
 }

@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model Session {
@@ -14,7 +16,7 @@ model Session {
   status            String        @default("WAITING") // WAITING | ACTIVE | PAUSED | COMPLETED
   currentRoundIndex Int           @default(-1)
   adminKey          String        @unique
-  // Settings (stored inline for SQLite compatibility)
+  // Settings
   timerEnabled      Boolean       @default(false)
   timerDuration     Int           @default(120)
   anonymousMode     Boolean       @default(false)

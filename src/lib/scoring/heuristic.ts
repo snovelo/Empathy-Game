@@ -12,25 +12,31 @@ function countPhraseHits(text: string, phrases: string[]): number {
 
 // ─── G — Go Beyond the Ask: Empathy ──────────────────────────────────────────
 
-// Regex patterns — catch natural variations and synonyms in one pattern
 const EMPATHY_REGEX: RegExp[] = [
-  // Acknowledgment with intensifier
-  /i\s+(completely|truly|fully|genuinely|deeply|sincerely|really|absolutely|totally)\s+understand/,
-  // Core understanding variations
+  // Acknowledgment with intensifier — broad modifier list including "really"
+  /i\s+(completely|truly|fully|genuinely|deeply|sincerely|really|absolutely|totally|so)\s+understand/,
+  // "I'm/I am [really|so|truly|...] sorry" — fixed to catch all common intensifiers
+  /i'?m\s+(so|really|truly|deeply|genuinely|sincerely|very|terribly|awfully|extremely|just)\s+sorry/,
+  /i\s+am\s+(so|really|truly|deeply|genuinely|sincerely|very|terribly|awfully|extremely)\s+sorry/,
+  // Plain apology forms
+  /i('m|\s+am)\s+sorry\b/,
+  /i\s+(sincerely|deeply|humbly|truly)\s+apologize/,
+  // Core understanding/sensing
   /i\s+(can\s+)?(hear|see|feel|sense)\s+(how|that|what)\s+\w/,
   /i\s+can\s+only\s+imagine\s+how/,
-  // "That must be / feel / have been"
-  /that\s+must\s+(be|feel|seem|have\s+been)/,
-  // Naming the emotion in context
-  /how\s+(frustrating|disappointing|upsetting|stressful|difficult|confusing|infuriating|exhausting)\s+(this|that)\s+(must|is|was|sounds|seems)/,
-  /(this|that)\s+(is|sounds|seems|must\s+be)\s+(so\s+)?(frustrating|disappointing|upsetting|stressful|difficult|infuriating|exhausting)/,
-  // Apology variants
-  /i('m|\s+am)\s+(so\s+|truly\s+|deeply\s+|sincerely\s+|genuinely\s+)?sorry/,
-  /i\s+(sincerely|deeply|humbly|truly)\s+apologize/,
+  // "That/this/it must be/feel..."
+  /(that|this|it)\s+must\s+(be|feel|seem|have\s+been)/,
+  // Naming emotion in context — expanded to include "it's"
+  /how\s+(frustrating|disappointing|upsetting|stressful|difficult|confusing|infuriating|exhausting|annoying|aggravating)\s+(this|that|it)\s+(must|is|was|sounds|seems)/,
+  /(it'?s?|this\s+is|that'?s?)\s+(so\s+)?(frustrating|disappointing|upsetting|stressful|difficult|infuriating|exhausting|confusing|annoying|aggravating)/,
   // Validation phrases
   /(that'?s?|this\s+is)\s+(completely|totally|absolutely|perfectly|entirely|100%)\s+(understandable|valid|fair|reasonable)/,
   /you\s+(have\s+every\s+right|shouldn'?t\s+have\s+to|deserve\s+better|didn'?t\s+deserve)/,
-  /your\s+(frustration|concern|disappointment|confusion|feelings?)\s+(is|are|makes?)\s+(completely|totally|absolutely|perfectly)?\s*(valid|understandable|justified|fair)/,
+  /your\s+(frustration|concern|disappointment|confusion|feelings?|experience)\s+(is|are|makes?)\s+(completely|totally|absolutely|perfectly)?\s*(valid|understandable|justified|fair)/,
+  // "Had to go through" — empathy for repeated/painful experience
+  /(had\s+to\s+go\s+through|been\s+through\s+this|gone\s+through\s+this|put\s+through\s+this)/,
+  // "Not getting the help you need/deserve"
+  /(not\s+get(ting)?\s+the\s+help|without\s+the\s+support|deserve\s+(better|more\s+than\s+this))/,
   // Making it right
   /i\s+(want|need|intend)\s+to\s+make\s+this\s+right/,
   /let\s+me\s+make\s+this\s+right/,
@@ -38,9 +44,13 @@ const EMPATHY_REGEX: RegExp[] = [
   /i\s+(acknowledge|recognize|validate|hear)\s+(your|this|that|how)/,
   /you\s+(feel|felt)\s+(heard|valued|understood|seen)/,
   /that\s+(is|was)\s+(not\s+okay|unacceptable|not\s+right|not\s+how)/,
+  // Appreciating patience — strong empathy + care signal
+  /i\s+(appreciate|value|recognize)\s+your\s+(patience|understanding|time|trust|loyalty)/,
+  // "I completely/really/fully get how..."
+  /i\s+(completely|fully|truly|really|genuinely|totally)\s*(get|understand|see|hear)\s+(how|what|why|that|this)/,
+  // Negated empathy (penalty catch — do NOT add to positives)
 ];
 
-// Exact phrases — common, concise expressions worth catching literally
 const EMPATHY_PHRASES: string[] = [
   "i understand",
   "i can understand",
@@ -50,12 +60,20 @@ const EMPATHY_PHRASES: string[] = [
   "i apologize",
   "i'm sorry",
   "i am sorry",
+  "i'm so sorry",
+  "i'm really sorry",
+  "so sorry",
   "that's frustrating",
   "that is frustrating",
+  "it's frustrating",
+  "it is frustrating",
   "that's disappointing",
   "that is disappointing",
+  "it's disappointing",
+  "that's upsetting",
   "i know how",
   "this must",
+  "that must",
   "how difficult",
   "your experience",
   "your feelings",
@@ -64,9 +82,17 @@ const EMPATHY_PHRASES: string[] = [
   "that's understandable",
   "that is understandable",
   "i empathize",
+  "appreciate your patience",
+  "appreciate your understanding",
+  "had to go through",
+  "go through that",
+  "go through this",
+  "you've had to",
+  "repeat yourself",
+  "not get the help",
+  "shouldn't have to",
 ];
 
-// Single concept words — lighter signal, each counts as ~0.5 of a phrase hit
 const EMPATHY_CONCEPT_WORDS: string[] = [
   "frustrating", "frustrated", "frustration",
   "disappointing", "disappointed", "disappointment",
@@ -74,9 +100,12 @@ const EMPATHY_CONCEPT_WORDS: string[] = [
   "confusing", "confused", "confusion",
   "stressful", "stressed",
   "exhausting", "exhausted",
+  "annoying", "annoyed",
+  "aggravating", "aggravated",
   "empathize", "empathy",
   "validate", "validated",
   "acknowledge", "acknowledged",
+  "patience", "patient",
 ];
 
 // ─── L — Lead with Care: Tone ─────────────────────────────────────────────────
@@ -86,16 +115,22 @@ const TONE_REGEX: RegExp[] = [
   /(i'?d?\s+love|i\s+would\s+love|i'?m\s+happy|i\s+am\s+happy)\s+to\s+help/,
   /\b(here|happy|glad|pleased)\s+to\s+help\b/,
   /let\s+me\s+(help|assist|take\s+care|sort\s+this|get\s+this)/,
+  // "Let's get this [resolved/sorted/handled]" — collaborative urgency
+  /let'?s\s+(get\s+this|work\s+(on\s+this|through|together)|figure\s+this|sort\s+this)/,
   // Appreciation
   /thank\s+you\s+for\s+(bringing|reaching|contacting|your|letting|taking)/,
   /i\s+(appreciate|value)\s+(you|your|this|that)/,
+  // Appreciating patience explicitly
+  /i\s+(appreciate|value|recognize)\s+your\s+(patience|understanding|time|trust|loyalty)/,
   // Priority language
   /(top|first|high|my)\s+priority/,
   /as\s+a\s+priority/,
   /right\s+(away|now|this\s+moment)/,
   /\bimmediately\b/,
+  // Urgency — "as quickly/soon as possible"
+  /as\s+(quickly|soon|fast)\s+as\s+possible/,
   // Affirming tone
-  /\b(certainly|absolutely|of\s+course|definitely|absolutely)\b/,
+  /\b(certainly|absolutely|of\s+course|definitely)\b/,
   // Customer value language
   /(you\s+are|you'?re)\s+a?\s*(valued|important|our\s+priority)/,
   /we\s+(value|care\s+about)\s+you/,
@@ -110,6 +145,8 @@ const TONE_REGEX: RegExp[] = [
   /please\s+know/,
   /i\s+want\s+you\s+to\s+know/,
   /i\s+care\s+about\s+(you|this|your)/,
+  // "You won't/don't have to [worry/explain/deal] again" — reassurance
+  /you\s+(won'?t|don'?t)\s+have\s+to\s+(worry|explain|deal|go\s+through|repeat|do\s+this)/,
 ];
 
 const TONE_PHRASES: string[] = [
@@ -133,27 +170,46 @@ const TONE_PHRASES: string[] = [
   "moving forward",
   "together",
   "i care about",
+  "as quickly as possible",
+  "as soon as possible",
+  "let's get this",
+  "let's work",
+  "appreciate your patience",
+  "appreciate your understanding",
+  "you won't have to",
+  "you don't have to",
+  "won't happen again",
 ];
 
 // ─── O+D — Own Every Moment + Do It Together: Ownership ───────────────────────
 
 const OWNERSHIP_REGEX: RegExp[] = [
-  // Personal ownership with action
-  /i\s+('?ll|will)\s+personally\s+\w/,
+  // Personal ownership with action — fixed contraction handling throughout
+  /(i'?ll|i\s+will)\s+personally\s+\w/,
   /let\s+me\s+personally\s+\w/,
   /i\s+personally\s+(will|want|commit|ensure|guarantee|promise)/,
-  // Taking full responsibility
+  // Taking ownership explicitly — catches "i'll take ownership/responsibility"
+  /(i'?ll|i\s+will|i\s+am\s+going\s+to|i'?m\s+going\s+to)\s+take\s+(ownership|responsibility|charge|the\s+lead|full)/,
   /i\s+take\s+(full|complete|total|personal|ownership|responsibility)/,
   /i\s+(own|accept)\s+(this|that|full|complete)\s*(responsibility|outcome|issue)?/,
+  // "Take it/this from here" — handoff ownership
+  /(i'?ll|i\s+will)\s+take\s+(it|this)\s+from\s+here/,
+  /from\s+here\s+(on|forward|out)/,
   // Specific commitment structures
   /here'?s?\s+(what|my plan|my next step)/,
   /what\s+i\s+('?ll|will|can)\s+do\s+(is|for\s+you|right\s+now)/,
-  // Personal follow-through
-  /i\s+('?ll|will)\s+(follow\s+up|check\s+back|reach\s+out|get\s+back|update\s+you|keep\s+you\s+posted)/,
-  /i\s+('?ll|will)\s+see\s+this\s+through/,
+  // Personal follow-through — fixed i'll contractions
+  /(i'?ll|i\s+will)\s+(follow\s+up|check\s+back|reach\s+out|get\s+back|update\s+you|keep\s+you\s+posted)/,
+  /(i'?ll|i\s+will)\s+see\s+this\s+through/,
   /i\s+won'?t\s+(stop|rest|let\s+this)/,
-  // Specific action commitment
-  /i\s+('?ll|will)\s+(take\s+care|handle|resolve|fix|address|look\s+into|investigate|get\s+this)/,
+  // Specific action commitment — fixed contractions
+  /(i'?ll|i\s+will)\s+(take\s+care|handle|resolve|fix|address|look\s+into|investigate|get\s+this|sort\s+this)/,
+  // "I'll make sure" — strong ownership signal
+  /(i'?ll|i\s+will)\s+make\s+sure/,
+  // "Let's get this resolved/sorted" — collaborative ownership
+  /let'?s\s+(get\s+this\s+(resolved|sorted|fixed|handled|addressed)|resolve\s+this|sort\s+this\s+out)/,
+  // "You won't have to explain/repeat again"
+  /you\s+(won'?t|don'?t)\s+have\s+to\s+(explain|repeat|go\s+through|deal\s+with)\s+(it|this|that|again)?/,
   // Promise language
   /\b(you\s+have\s+my\s+word|i\s+promise|i\s+commit|i\s+guarantee)\b/,
   // Going above and beyond
@@ -181,7 +237,10 @@ const OWNERSHIP_PHRASES: string[] = [
   "we'll fix this",
   "we will fix this",
   "let's get this sorted",
+  "let's get this resolved",
+  "let's resolve",
   "get this sorted",
+  "get this resolved",
   "i'll do my best",
   "let me see what",
   "i can do for you",
@@ -190,7 +249,19 @@ const OWNERSHIP_PHRASES: string[] = [
   "i will take care",
   "i'll make sure",
   "i will make sure",
+  "i'll take ownership",
+  "take ownership",
+  "take responsibility",
+  "take it from here",
+  "take this from here",
+  "from here on",
+  "you won't have to explain",
+  "you don't have to explain",
+  "won't have to repeat",
+  "don't have to repeat",
   "follow through",
+  "as quickly as possible",
+  "as soon as possible",
 ];
 
 const OWNERSHIP_CONCEPT_WORDS: string[] = [
@@ -204,6 +275,7 @@ const OWNERSHIP_CONCEPT_WORDS: string[] = [
   "resolve", "resolving", "resolution",
   "own", "ownership",
   "personally",
+  "immediately",
 ];
 
 // ─── Penalty patterns ─────────────────────────────────────────────────────────
@@ -259,7 +331,6 @@ export function scoreHeuristic(
   // --- G: Empathy scoring
   const empathyRegexHits  = countRegexHits(text, EMPATHY_REGEX);
   const empathyPhraseHits = countPhraseHits(text, EMPATHY_PHRASES);
-  // Concept words count as 0.5 each — use Math.floor(n/2) to convert to whole hits
   const empathyConceptBonus = Math.floor(countPhraseHits(text, EMPATHY_CONCEPT_WORDS) / 2);
   const empathyTotal = empathyRegexHits + empathyPhraseHits + empathyConceptBonus;
 
@@ -376,10 +447,10 @@ function buildTip(empathy: number, tone: number, ownership: number, wordCount: n
     return 'G — Go Beyond the Ask: Lead with the feeling first. Try: "I completely understand how [emotion] this must be, and I want to make sure we get this right for you."';
   }
   if (ownership < 3) {
-    return 'O — Own Every Moment: Add a personal commitment. Try: "Here\'s what I\'ll personally do to make this right..." — specific ownership builds trust.';
+    return 'O — Own Every Moment: Add a personal commitment. Try: "I\'ll take ownership of this from here so you don\'t have to explain it again."';
   }
   if (tone < 3) {
-    return 'L — Lead with Care: Warm up your language. Phrases like "I\'d love to help" or "Let me take care of this personally" show you lead with care.';
+    return 'L — Lead with Care: Warm up your language. Phrases like "I appreciate your patience" or "Let\'s get this resolved as quickly as possible" show you lead with care.';
   }
   if (empathy === 3) {
     return 'G — Go Beyond the Ask: Name the specific emotion (frustration, disappointment, confusion) to make the empathy feel genuine and personal.';

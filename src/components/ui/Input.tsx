@@ -15,7 +15,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-semibold text-slate-300"
+            className="block text-sm font-semibold text-gray-700"
           >
             {label}
           </label>
@@ -24,17 +24,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-slate-100',
-            'placeholder:text-slate-500',
+            'w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900',
+            'placeholder:text-gray-400',
             'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent',
-            'disabled:bg-slate-900 disabled:text-slate-500 disabled:cursor-not-allowed',
-            error && 'border-red-500 focus:ring-red-500',
+            'disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed',
+            error && 'border-red-400 focus:ring-red-500',
             className,
           )}
           {...props}
         />
-        {hint && !error && <p className="text-xs text-slate-500">{hint}</p>}
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {hint && !error && <p className="text-xs text-gray-400">{hint}</p>}
+        {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     );
   },
@@ -56,14 +56,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className="space-y-1.5">
         {label && (
           <div className="flex items-center justify-between">
-            <label htmlFor={inputId} className="block text-sm font-semibold text-slate-300">
+            <label htmlFor={inputId} className="block text-sm font-semibold text-gray-700">
               {label}
             </label>
             {charCount !== undefined && maxChars !== undefined && (
               <span
                 className={cn(
                   'text-xs tabular-nums',
-                  charCount > maxChars * 0.9 ? 'text-brand-400' : 'text-slate-500',
+                  charCount > maxChars * 0.9 ? 'text-amber-500' : 'text-gray-400',
                 )}
               >
                 {charCount} / {maxChars}
@@ -75,17 +75,17 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-slate-100 leading-relaxed',
-            'placeholder:text-slate-500 resize-none',
+            'w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 leading-relaxed',
+            'placeholder:text-gray-400 resize-none',
             'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent',
-            'disabled:bg-slate-900 disabled:text-slate-500 disabled:cursor-not-allowed',
-            error && 'border-red-500 focus:ring-red-500',
+            'disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed',
+            error && 'border-red-400 focus:ring-red-500',
             className,
           )}
           {...props}
         />
-        {hint && !error && <p className="text-xs text-slate-500">{hint}</p>}
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {hint && !error && <p className="text-xs text-gray-400">{hint}</p>}
+        {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     );
   },

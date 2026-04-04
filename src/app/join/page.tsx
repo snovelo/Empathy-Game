@@ -81,10 +81,10 @@ function JoinForm() {
   }
 
   return (
-    <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-md p-8">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-md p-8">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white">Join a Session</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-gray-900">Join a Session</h1>
+        <p className="text-gray-500 text-sm mt-1">
           Enter the session code shared by your facilitator
         </p>
       </div>
@@ -129,8 +129,8 @@ function JoinForm() {
                 onClick={() => setForm((f) => ({ ...f, teamName: t }))}
                 className={`text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${
                   form.teamName === t
-                    ? 'bg-brand-500/20 text-brand-300 border-brand-500/40'
-                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-600'
+                    ? 'bg-brand-100 text-brand-700 border-brand-300'
+                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-300'
                 }`}
               >
                 {t}
@@ -142,7 +142,7 @@ function JoinForm() {
         {error && (
           <div
             role="alert"
-            className="text-sm text-red-400 bg-red-950/30 border border-red-800/50 rounded-xl px-4 py-3"
+            className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3"
           >
             {error}
           </div>
@@ -158,13 +158,13 @@ function JoinForm() {
 
 export default function JoinPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-br from-dark-950 via-slate-950 to-dark-900">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-br from-green-50 via-white to-green-50">
       <div className="w-full max-w-md animate-slide-up">
-        <Link href="/" className="flex items-center gap-2 text-brand-400 text-sm font-medium mb-8 hover:text-brand-300 transition-colors">
+        <Link href="/" className="flex items-center gap-2 text-brand-600 text-sm font-medium mb-8 hover:text-brand-700 transition-colors">
           ← Back to home
         </Link>
         <Suspense fallback={
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 p-8 text-center">
+          <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
             <div className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto" />
           </div>
         }>

@@ -68,7 +68,7 @@ export default function ResultsPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -77,7 +77,6 @@ export default function ResultsPage() {
   const allSubmissions = session.sessionRounds.flatMap((sr) => sr.submissions);
   const leaderboard = buildLeaderboard(allSubmissions);
 
-  // My submissions
   const myRoundScores = session.sessionRounds
     .map((sr) => {
       const mine = sr.submissions.find((s) => s.participantId === participantId);
@@ -91,52 +90,52 @@ export default function ResultsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-dark-950 via-slate-950 to-dark-900 py-8 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 py-8 px-4">
       <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
         {/* Hero */}
         <div className="text-center py-6">
           <p className="text-6xl mb-4 animate-slide-up">🎉</p>
-          <h1 className="text-3xl font-extrabold text-white mb-2">Game Over!</h1>
-          <p className="text-slate-400">Thanks for playing {session.title}</p>
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Game Over!</h1>
+          <p className="text-gray-500">Thanks for playing {session.title}</p>
         </div>
 
         {/* Winner banner */}
         {leaderboard.length > 0 && (
-          <div className="bg-gradient-to-r from-brand-500 to-amber-600 rounded-2xl p-6 text-white text-center shadow-lg">
+          <div className="bg-gradient-to-r from-brand-500 to-amber-500 rounded-2xl p-6 text-white text-center shadow-lg">
             <p className="text-2xl mb-1">🏆</p>
             <p className="text-xl font-bold">{leaderboard.sort((a, b) => b.totalScore - a.totalScore)[0]?.teamName}</p>
-            <p className="text-black/70 text-sm font-medium mt-0.5">Top GOLD Standard Team</p>
+            <p className="text-white/80 text-sm font-medium mt-0.5">Top <span className="text-amber-200 font-bold">GOLD</span> Standard Team</p>
           </div>
         )}
 
         {/* My performance */}
         {participantId && myRoundScores.length > 0 && (
-          <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-white">Your Performance</h2>
+              <h2 className="font-bold text-gray-900">Your Performance</h2>
               <div className="text-right">
                 <p className={cn('text-2xl font-bold', scoreColor(myTotalScore))}>{myTotalScore}</p>
-                <p className="text-xs text-slate-400">total pts</p>
+                <p className="text-xs text-gray-400">total pts</p>
               </div>
             </div>
             <div className="space-y-2">
               {myRoundScores.map(({ round, submission }) => (
                 <div
                   key={round.title}
-                  className="flex items-center justify-between py-2 border-b border-slate-800 last:border-0"
+                  className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     {round.isBonus && <Badge variant="bonus">⚡</Badge>}
-                    <span className="text-sm text-slate-200 truncate">{round.title}</span>
+                    <span className="text-sm text-gray-700 truncate">{round.title}</span>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-gray-400">
                       E:{submission!.empathyScore ?? '—'} T:{submission!.toneScore ?? '—'} O:{submission!.ownershipScore ?? '—'}
                     </span>
                     <span className={cn('text-sm font-bold tabular-nums', scoreColor(submission!.finalScore ?? 0))}>
                       {submission!.finalScore ?? '—'}
                       {round.isBonus && (
-                        <span className="text-xs font-normal text-amber-600 ml-0.5">×2</span>
+                        <span className="text-xs font-normal text-amber-500 ml-0.5">×2</span>
                       )}
                     </span>
                   </div>
@@ -147,8 +146,8 @@ export default function ResultsPage() {
         )}
 
         {/* Team Leaderboard */}
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6">
-          <h2 className="font-bold text-white mb-4">Final Team Leaderboard</h2>
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Final Team Leaderboard</h2>
           <Leaderboard
             entries={leaderboard}
             highlightTeam={participantTeam}
@@ -157,8 +156,8 @@ export default function ResultsPage() {
         </div>
 
         {/* Round summary */}
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6">
-          <h2 className="font-bold text-white mb-4">Round Summary</h2>
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Round Summary</h2>
           <div className="space-y-3">
             {session.sessionRounds
               .filter((sr) => sr.status === 'CLOSED')
@@ -169,17 +168,17 @@ export default function ResultsPage() {
                       sr.submissions.length
                     : null;
                 return (
-                  <div key={sr.id} className="flex items-center justify-between py-2 border-b border-slate-800 last:border-0">
+                  <div key={sr.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                     <div className="flex items-center gap-2">
                       {sr.round.isBonus && <Badge variant="bonus">⚡</Badge>}
-                      <span className="text-sm text-slate-200">{sr.round.title}</span>
+                      <span className="text-sm text-gray-700">{sr.round.title}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-semibold text-slate-200">
+                      <span className="text-sm font-semibold text-gray-700">
                         {sr.submissions.length} responses
                       </span>
                       {avg !== null && (
-                        <span className="text-xs text-slate-400 ml-2">
+                        <span className="text-xs text-gray-400 ml-2">
                           avg {avg.toFixed(1)} pts
                         </span>
                       )}
@@ -192,7 +191,7 @@ export default function ResultsPage() {
 
         {/* CTA */}
         <div className="text-center pb-6">
-          <p className="text-slate-400 text-sm italic mb-4">
+          <p className="text-gray-400 text-sm italic mb-4">
             &ldquo;Validate feelings first. Own the outcome. Lead with care.&rdquo;
           </p>
           <Link href="/">

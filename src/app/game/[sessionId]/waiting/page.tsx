@@ -43,13 +43,11 @@ export default function WaitingRoomPage() {
   );
 
   useEffect(() => {
-    // Initial fetch
     fetch(`/api/sessions/${sessionId}`)
       .then((r) => r.json())
       .then((d) => handleStateChange(d))
       .catch(console.error);
 
-    // SSE for real-time updates
     const es = new EventSource(`/api/events/${sessionId}`);
     es.onmessage = (e) => {
       try {
@@ -69,21 +67,21 @@ export default function WaitingRoomPage() {
   });
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-dark-950 via-slate-950 to-dark-900 flex items-center justify-center px-4 py-12">
+    <main className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl animate-fade-in">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-emerald-900/30 text-emerald-400 text-xs font-semibold rounded-full px-3 py-1 mb-4 border border-emerald-700/40">
+          <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full px-3 py-1 mb-4 border border-emerald-200">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping-slow" />
             Waiting for game to start
           </div>
-          <h1 className="text-3xl font-bold text-white">
-            {session?.title ?? 'The Empathy Game'}
+          <h1 className="text-3xl font-bold text-gray-900">
+            {session?.title ?? 'The GOLD Standard Game'}
           </h1>
           {session?.code && (
             <div className="mt-3 inline-flex items-center gap-2">
-              <span className="text-slate-400 text-sm">Session code:</span>
-              <code className="bg-brand-500/20 text-brand-300 font-mono font-bold px-3 py-1 rounded-lg text-lg tracking-widest border border-brand-500/30">
+              <span className="text-gray-500 text-sm">Session code:</span>
+              <code className="bg-brand-50 text-brand-700 font-mono font-bold px-3 py-1 rounded-lg text-lg tracking-widest border border-brand-200">
                 {session.code}
               </code>
             </div>
@@ -91,14 +89,14 @@ export default function WaitingRoomPage() {
         </div>
 
         {/* Participants */}
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6 mb-4">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-white">Participants</h2>
+            <h2 className="font-bold text-gray-900">Participants</h2>
             <Badge variant="info">{session?.participants.length ?? 0} joined</Badge>
           </div>
 
           {session?.participants.length === 0 && (
-            <p className="text-slate-400 text-sm text-center py-4">
+            <p className="text-gray-400 text-sm text-center py-4">
               No participants yet. Share the join code!
             </p>
           )}
@@ -117,8 +115,8 @@ export default function WaitingRoomPage() {
                       key={p.id}
                       className={`text-sm px-3 py-1 rounded-full border font-medium ${
                         p.displayName === myName
-                          ? 'bg-brand-500/20 text-brand-300 border-brand-500/40'
-                          : 'bg-slate-800 text-slate-300 border-slate-700'
+                          ? 'bg-brand-100 text-brand-700 border-brand-300'
+                          : 'bg-gray-50 text-gray-700 border-gray-200'
                       }`}
                     >
                       {p.displayName === myName ? '⭐ ' : ''}
@@ -131,20 +129,20 @@ export default function WaitingRoomPage() {
           </div>
         </div>
 
-        <div className="bg-brand-500/10 rounded-2xl border border-brand-500/30 p-4 text-center">
-          <p className="text-brand-300 text-sm font-medium">
+        <div className="bg-brand-50 rounded-2xl border border-brand-200 p-4 text-center">
+          <p className="text-brand-700 text-sm font-medium">
             The facilitator will start the game when everyone is ready.
           </p>
-          <p className="text-brand-400 text-xs mt-1">
+          <p className="text-brand-500 text-xs mt-1">
             You&apos;ll be redirected automatically when the game begins.
           </p>
         </div>
 
         {/* Tip */}
-        <div className="mt-6 bg-slate-900 rounded-xl border border-slate-800 p-4">
-          <p className="text-xs text-slate-400 text-center font-medium mb-2">💡 Quick Tip</p>
-          <p className="text-sm text-slate-400 text-center">
-            Remember the GOLD Standard: <strong>G</strong>o beyond the ask, <strong>O</strong>wn every moment, <strong>L</strong>ead with care, <strong>D</strong>o it together.
+        <div className="mt-6 bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-400 text-center font-medium mb-2">💡 Quick Tip</p>
+          <p className="text-sm text-gray-500 text-center">
+            Remember the <span className="text-amber-500 font-semibold">GOLD</span> Standard: <strong>G</strong>o beyond the ask, <strong>O</strong>wn every moment, <strong>L</strong>ead with care, <strong>D</strong>o it together.
             Think: <em>&ldquo;Validate feelings first. Own the outcome. Lead with care.&rdquo;</em>
           </p>
         </div>

@@ -6,9 +6,9 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Card({ className, variant = 'default', children, ...props }: CardProps) {
   const variants = {
-    default: 'bg-slate-900 border border-slate-800 shadow-sm',
-    bonus: 'bg-gradient-to-br from-amber-950/60 to-yellow-950/40 border-2 border-brand-500/60 shadow-[0_0_20px_rgba(245,158,11,0.15)]',
-    elevated: 'bg-slate-900 border border-slate-700 shadow-md hover:shadow-[0_0_16px_rgba(245,158,11,0.1)] transition-shadow',
+    default: 'bg-white border border-gray-200 shadow-sm',
+    bonus: 'bg-gradient-to-br from-brand-50 to-green-100 border-2 border-brand-400/60 shadow-[0_0_20px_rgba(34,197,94,0.15)]',
+    elevated: 'bg-white border border-gray-200 shadow-md hover:shadow-[0_0_16px_rgba(34,197,94,0.12)] transition-shadow',
   };
   return (
     <div className={cn('rounded-2xl p-6', variants[variant], className)} {...props}>
@@ -27,7 +27,7 @@ export function CardHeader({ className, children, ...props }: React.HTMLAttribut
 
 export function CardTitle({ className, children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h2 className={cn('text-xl font-bold text-white', className)} {...props}>
+    <h2 className={cn('text-xl font-bold text-gray-900', className)} {...props}>
       {children}
     </h2>
   );

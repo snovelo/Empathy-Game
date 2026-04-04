@@ -42,21 +42,21 @@ export default function AdminLandingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-dark-950 via-slate-950 to-dark-900 flex items-center justify-center px-4 py-12">
+    <main className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md animate-slide-up">
         <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="text-brand-400 text-sm font-medium hover:text-brand-300 transition-colors">
+          <Link href="/" className="text-brand-600 text-sm font-medium hover:text-brand-700 transition-colors">
             ← Back to home
           </Link>
-          <span className="text-xs bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700 font-medium">
+          <span className="text-xs bg-gray-100 text-gray-500 px-3 py-1 rounded-full border border-gray-200 font-medium">
             Facilitator Mode
           </span>
         </div>
 
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-md p-8">
-          <h1 className="text-2xl font-bold text-white mb-1">Create a Session</h1>
-          <p className="text-slate-400 text-sm mb-8">
-            Set up a new GOLD Standard Game session for your team.
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-md p-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Create a Session</h1>
+          <p className="text-gray-500 text-sm mb-8">
+            Set up a new <span className="text-amber-500 font-medium">GOLD</span> Standard Game session for your team.
           </p>
 
           <div className="space-y-5">
@@ -70,14 +70,14 @@ export default function AdminLandingPage() {
             {/* Timer */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-300">Round Timer</label>
+                <label className="text-sm font-semibold text-gray-700">Round Timer</label>
                 <button
                   type="button"
                   role="switch"
                   aria-checked={form.timerEnabled}
                   onClick={() => setForm((f) => ({ ...f, timerEnabled: !f.timerEnabled }))}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 ${
-                    form.timerEnabled ? 'bg-brand-500' : 'bg-slate-700'
+                    form.timerEnabled ? 'bg-brand-500' : 'bg-gray-300'
                   }`}
                 >
                   <span
@@ -101,7 +101,7 @@ export default function AdminLandingPage() {
             </div>
 
             {/* Toggles */}
-            <div className="space-y-3 border-t border-slate-800 pt-4">
+            <div className="space-y-3 border-t border-gray-200 pt-4">
               {(
                 [
                   { key: 'allowEdits', label: 'Allow response edits before round closes' },
@@ -110,14 +110,14 @@ export default function AdminLandingPage() {
                 ] as const
               ).map(({ key, label }) => (
                 <div key={key} className="flex items-center justify-between">
-                  <span className="text-sm text-slate-300">{label}</span>
+                  <span className="text-sm text-gray-600">{label}</span>
                   <button
                     type="button"
                     role="switch"
                     aria-checked={form[key]}
                     onClick={() => setForm((f) => ({ ...f, [key]: !f[key] }))}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      form[key] ? 'bg-brand-500' : 'bg-slate-700'
+                      form[key] ? 'bg-brand-500' : 'bg-gray-300'
                     }`}
                   >
                     <span
@@ -131,7 +131,7 @@ export default function AdminLandingPage() {
             </div>
 
             {error && (
-              <div className="text-sm text-red-400 bg-red-950/30 border border-red-800/50 rounded-xl px-4 py-3">
+              <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
                 {error}
               </div>
             )}
@@ -142,7 +142,7 @@ export default function AdminLandingPage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-600 mt-6">
+        <p className="text-center text-xs text-gray-400 mt-6">
           For internal training use only · Not for live customer interactions
         </p>
       </div>

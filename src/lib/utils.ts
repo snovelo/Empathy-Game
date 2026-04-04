@@ -45,10 +45,10 @@ export function teamColor(teamName: string): string {
 }
 
 export function scoreColor(score: number): string {
-  if (score >= 9) return 'text-emerald-400';
-  if (score >= 7) return 'text-brand-400';
+  if (score >= 9) return 'text-emerald-600';
+  if (score >= 7) return 'text-brand-600';
   if (score >= 5) return 'text-amber-500';
-  return 'text-red-400';
+  return 'text-red-500';
 }
 
 export function formatDate(date: Date | string): string {

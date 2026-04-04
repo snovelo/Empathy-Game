@@ -11,16 +11,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', loading, disabled, children, ...props }, ref) => {
     const base =
-      'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-150 focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed select-none';
+      'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-150 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed select-none';
 
     const variants = {
       primary:
-        'bg-brand-500 text-black hover:bg-brand-400 active:bg-brand-600 shadow-sm hover:shadow-[0_0_12px_rgba(245,158,11,0.4)]',
+        'bg-brand-500 text-white hover:bg-brand-600 active:bg-brand-700 shadow-sm hover:shadow-[0_0_12px_rgba(34,197,94,0.35)]',
       secondary:
-        'bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 hover:border-slate-600 shadow-sm',
-      ghost: 'text-slate-400 hover:bg-slate-800 hover:text-slate-100',
+        'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm',
+      ghost: 'text-gray-500 hover:bg-gray-100 hover:text-gray-900',
       danger: 'bg-red-600 text-white hover:bg-red-500 active:bg-red-700 shadow-sm',
-      outline: 'border-2 border-brand-500 text-brand-400 hover:bg-brand-500/10',
+      outline: 'border-2 border-brand-500 text-brand-600 hover:bg-brand-50',
     };
 
     const sizes = {
